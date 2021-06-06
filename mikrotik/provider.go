@@ -54,12 +54,13 @@ func Provider() terraform.ResourceProvider {
 			"mikrotik_pool":         resourcePool(),
 			"mikrotik_bgp_instance": resourceBgpInstance(),
 			// TODO these should be sorted, surely
-			"mikrotik_vlan": resourceVlan(),
+			// "mikrotik_vlan": resourceVlan(),
 			// TODO remove _interface?
 			"mikrotik_interface_bond":        resourceInterfaceBond(),
 			"mikrotik_interface_ethernet":    resourceInterfaceEthernet(),
 			"mikrotik_interface_bridge_port": resourceInterfaceBridgePort(),
 			"mikrotik_interface_bridge_vlan": resourceInterfaceBridgeVlan(),
+			"mikrotik_interface_vlan":        resourceInterfaceVlan(),
 		},
 		ConfigureFunc: mikrotikConfigure,
 	}

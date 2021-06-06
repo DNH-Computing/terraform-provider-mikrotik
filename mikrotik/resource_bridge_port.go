@@ -1,8 +1,7 @@
 package mikrotik
 
 import (
-	"errors"
-
+	"github.com/ddelnano/terraform-provider-mikrotik/client"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 )
 
@@ -33,89 +32,104 @@ func resourceInterfaceBridgePort() *schema.Resource {
 				Type:     schema.TypeString,
 				Optional: true,
 			},
+			"tag_stacking": &schema.Schema{
+				Type:     schema.TypeBool,
+				Optional: true,
+			},
 		},
 	}
 }
 
 func resourceInterfaceBridgePortCreate(d *schema.ResourceData, m interface{}) error {
-	return errors.New("Not yet implemented")
-	// vlan := prepareVlan(d)
+	port := prepareBridgePort(d)
 
-	// c := m.(client.Mikrotik)
+	client := m.(client.Mikrotik)
 
-	// vlan, err := c.AddVlan(vlan)
-	// if err != nil {
-	// 	return err
-	// }
+	port, err := client.AddBridgePort(port)
+	if err != nil {
+		return err
+	}
 
-	// vlanToData(vlan, d)
-	// return nil
+	bridgePortToData(port, d)
+	return nil
 }
 
 func resourceInterfaceBridgePortRead(d *schema.ResourceData, m interface{}) error {
-	return errors.New("Not yet implemented")
-	// c := m.(client.Mikrotik)
+	c := m.(client.Mikrotik)
 
-	// vlan, err := c.FindVlan(d.Id())
+	port, err := c.FindBridgePort(d.Id())
 
-	// if err != nil {
-	// 	d.SetId("")
-	// 	return nil
-	// }
+	if err != nil {
+		d.SetId("")
+		return nil
+	}
 
-	// if vlan == nil {
-	// 	d.SetId("")
-	// 	return nil
-	// }
+	if port == nil {
+		d.SetId("")
+		return nil
+	}
 
-	// vlanToData(vlan, d)
-	// return nil
+	bridgePortToData(port, d)
+	return nil
 }
 
 func resourceInterfaceBridgePortUpdate(d *schema.ResourceData, m interface{}) error {
-	return errors.New("Not yet implemented")
-	// c := m.(client.Mikrotik)
+	c := m.(client.Mikrotik)
 
-	// vlan := prepareVlan(d)
-	// vlan.Id = d.Id()
+	port := prepareBridgePort(d)
+	port.Id = d.Id()
 
-	// vlan, err := c.UpdateVlan(vlan)
-	// vlan.Dynamic = vlan.Dynamic
+	port, err := c.UpdateBridgePort(port)
 
-	// if err != nil {
-	// 	return err
-	// }
+	if err != nil {
+		return err
+	}
 
-	// vlanToData(vlan, d)
-	// return nil
+	bridgePortToData(port, d)
+	return nil
 }
 
 func resourceInterfaceBridgePortDelete(d *schema.ResourceData, m interface{}) error {
-	return errors.New("Not yet implemented")
-	// c := m.(client.Mikrotik)
+	c := m.(client.Mikrotik)
 
-	// err := c.DeleteVlan(d.Id())
+	err := c.DeleteBridgePort(d.Id())
 
-	// if err != nil {
-	// 	return err
-	// }
+	if err != nil {
+		return err
+	}
 
-	// d.SetId("")
-	// return nil
+	d.SetId("")
+	return nil
 }
 
-// func vlanToData(vlan *client.Vlan, d *schema.ResourceData) error {
-// 	d.SetId(vlan.Id)
-// 	d.Set("name", vlan.Name)
-// 	d.Set("vlan_id", vlan.VlanId)
-// 	return nil
-// }
+func bridgePortToData(port *client.BridgePort, d *schema.ResourceData) error {
+	d.SetId(port.Id)
+	if err := d.Set("bridge", port.Bridge); err != nil {
+		return err
+	}
+	if err := d.Set("interface", port.Interface); err != nil {
+		return err
+	}
+	if err := d.Set("pvid", port.Pvid); err != nil {
+		return err
+	}
+	if err := d.Set("edge", port.Edge); err != nil {
+		return err
+	}
+	if err := d.Set("tag_stacking", port.TagStacking); err != nil {
+		return err
+	}
+	return nil
+}
 
-// func prepareVlan(d *schema.ResourceData) *client.Vlan {
-// 	vlan := new(client.Vlan)
+func prepareBridgePort(d *schema.ResourceData) *client.BridgePort {
+	port := new(client.BridgePort)
 
-// 	vlan.Name = d.Get("name").(string)
-// 	vlan.VlanId = d.Get("vlan_id").(int)
+	port.Bridge = d.Get("bridge").(string)
+	port.Interface = d.Get("interface").(string)
+	port.Pvid = d.Get("pvid").(int)
+	port.Edge = d.Get("edge").(string)
+	port.TagStacking = d.Get("tag_stacking").(bool)
 
-// 	return vlan
-// }
+	return port
+}
