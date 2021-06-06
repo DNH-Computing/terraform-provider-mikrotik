@@ -1,7 +1,9 @@
 package mikrotik
 
 import (
-	"errors"
+	"strings"
+
+	"github.com/ddelnano/terraform-provider-mikrotik/client"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 )
@@ -25,7 +27,7 @@ func resourceInterfaceBridgeVlan() *schema.Resource {
 				Type:     schema.TypeSet,
 				Required: true,
 				Elem: &schema.Schema{
-					Type: schema.TypeInt,
+					Type: schema.TypeString,
 				},
 			},
 			"tagged": &schema.Schema{
@@ -49,84 +51,90 @@ func resourceInterfaceBridgeVlan() *schema.Resource {
 }
 
 func resourceInterfaceBridgeVlanCreate(d *schema.ResourceData, m interface{}) error {
-	return errors.New("Not yet implemented")
-	// vlan := prepareVlan(d)
+	vlan := prepareBridgeVlan(d)
 
-	// c := m.(client.Mikrotik)
+	c := m.(client.Mikrotik)
 
-	// vlan, err := c.AddVlan(vlan)
-	// if err != nil {
-	// 	return err
-	// }
+	vlan, err := c.AddBridgeVlan(vlan)
+	if err != nil {
+		return err
+	}
 
-	// vlanToData(vlan, d)
-	// return nil
+	return bridgeVlanToData(vlan, d)
 }
 
 func resourceInterfaceBridgeVlanRead(d *schema.ResourceData, m interface{}) error {
-	return errors.New("Not yet implemented")
-	// c := m.(client.Mikrotik)
+	c := m.(client.Mikrotik)
 
-	// vlan, err := c.FindVlan(d.Id())
+	vlan, err := c.FindBridgeVlan(d.Id())
 
-	// if err != nil {
-	// 	d.SetId("")
-	// 	return nil
-	// }
+	if err != nil {
+		return err
+	}
 
-	// if vlan == nil {
-	// 	d.SetId("")
-	// 	return nil
-	// }
-
-	// vlanToData(vlan, d)
-	// return nil
+	return bridgeVlanToData(vlan, d)
 }
 
 func resourceInterfaceBridgeVlanUpdate(d *schema.ResourceData, m interface{}) error {
-	return errors.New("Not yet implemented")
-	// c := m.(client.Mikrotik)
+	c := m.(client.Mikrotik)
 
-	// vlan := prepareVlan(d)
-	// vlan.Id = d.Id()
+	vlan := prepareBridgeVlan(d)
+	vlan.Id = d.Id()
 
-	// vlan, err := c.UpdateVlan(vlan)
-	// vlan.Dynamic = vlan.Dynamic
+	vlan, err := c.UpdateBridgeVlan(vlan)
 
-	// if err != nil {
-	// 	return err
-	// }
+	if err != nil {
+		return err
+	}
 
-	// vlanToData(vlan, d)
-	// return nil
+	return bridgeVlanToData(vlan, d)
 }
 
 func resourceInterfaceBridgeVlanDelete(d *schema.ResourceData, m interface{}) error {
-	return errors.New("Not yet implemented")
-	// c := m.(client.Mikrotik)
+	c := m.(client.Mikrotik)
 
-	// err := c.DeleteVlan(d.Id())
-
-	// if err != nil {
-	// 	return err
-	// }
-
-	// d.SetId("")
-	// return nil
+	return c.DeleteBridgeVlan(d.Id())
 }
 
-// func vlanToData(vlan *client.Vlan, d *schema.ResourceData) error {
-// 	d.SetId(vlan.Id)
-// 	d.Set("name", vlan.Name)
-// 	d.Set("vlan_id", vlan.VlanId)
-// 	return nil
-// }
+func bridgeVlanToData(vlan *client.BridgeVlan, d *schema.ResourceData) error {
+	d.SetId(vlan.Id)
+	if err := d.Set("bridge", vlan.Bridge); err != nil {
+		return err
+	}
+	if err := d.Set("vlan_ids", strings.Split(vlan.VlanIds, ",")); err != nil {
+		return err
+	}
+	if err := d.Set("tagged", strings.Split(vlan.Tagged, ",")); err != nil {
+		return err
+	}
+	if err := d.Set("untagged", strings.Split(vlan.Untagged, ",")); err != nil {
+		return err
+	}
+	return nil
+}
 
-// func prepareVlan(d *schema.ResourceData) *client.Vlan {
-// 	vlan := new(client.Vlan)
+func prepareBridgeVlan(d *schema.ResourceData) *client.BridgeVlan {
+	vlan := new(client.BridgeVlan)
 
-// 	vlan.Name = d.Get("name").(string)
-// 	vlan.VlanId = d.Get("vlan_id").(int)
+	vlan.Bridge = d.Get("bridge").(string)
 
-// 	return vlan
-// }
+	var vlanStrings []string
+	for _, vlan := range d.Get("vlan_ids").(*schema.Set).List() {
+		vlanStrings = append(vlanStrings, vlan.(string))
+	}
+	vlan.VlanIds = strings.Join(vlanStrings, ",")
+
+	var taggedStrings []string
+	for _, tagged := range d.Get("tagged").(*schema.Set).List() {
+		taggedStrings = append(taggedStrings, tagged.(string))
+	}
+	vlan.Tagged = strings.Join(taggedStrings, ",")
+
+	var untaggedStrings []string
+	for _, untagged := range d.Get("untagged").(*schema.Set).List() {
+		untaggedStrings = append(untaggedStrings, untagged.(string))
+	}
+	vlan.Untagged = strings.Join(untaggedStrings, ",")
+
+	return vlan
+}
