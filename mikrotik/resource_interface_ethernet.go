@@ -1,8 +1,9 @@
 package mikrotik
 
 import (
-	"errors"
+	"log"
 
+	"github.com/ddelnano/terraform-provider-mikrotik/client"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 )
 
@@ -30,84 +31,73 @@ func resourceInterfaceEthernet() *schema.Resource {
 }
 
 func resourceInterfaceEthernetCreate(d *schema.ResourceData, m interface{}) error {
-	return errors.New("Not yet implemented")
+	port := prepareEthernet(d)
 	// vlan := prepareVlan(d)
 
-	// c := m.(client.Mikrotik)
+	c := m.(client.Mikrotik)
 
-	// vlan, err := c.AddVlan(vlan)
-	// if err != nil {
-	// 	return err
-	// }
+	existingPort, err := c.FindEthernetByName(port.Name)
 
-	// vlanToData(vlan, d)
-	// return nil
+	if err != nil {
+		return err
+	}
+
+	d.SetId(existingPort.Id)
+
+	return resourceInterfaceEthernetUpdate(d, m)
 }
 
 func resourceInterfaceEthernetRead(d *schema.ResourceData, m interface{}) error {
-	return errors.New("Not yet implemented")
-	// c := m.(client.Mikrotik)
+	c := m.(client.Mikrotik)
 
-	// vlan, err := c.FindVlan(d.Id())
+	port, err := c.FindEthernet(d.Id())
 
-	// if err != nil {
-	// 	d.SetId("")
-	// 	return nil
-	// }
+	if err != nil {
+		d.SetId("")
+		return nil
+	}
 
-	// if vlan == nil {
-	// 	d.SetId("")
-	// 	return nil
-	// }
+	if port == nil {
+		d.SetId("")
+		return nil
+	}
 
-	// vlanToData(vlan, d)
-	// return nil
+	return ethernetToData(port, d)
 }
 
 func resourceInterfaceEthernetUpdate(d *schema.ResourceData, m interface{}) error {
-	return errors.New("Not yet implemented")
-	// c := m.(client.Mikrotik)
+	c := m.(client.Mikrotik)
 
-	// vlan := prepareVlan(d)
-	// vlan.Id = d.Id()
+	port := prepareEthernet(d)
+	port.Id = d.Id()
 
-	// vlan, err := c.UpdateVlan(vlan)
-	// vlan.Dynamic = vlan.Dynamic
+	port, err := c.UpdateEthernet(port)
 
-	// if err != nil {
-	// 	return err
-	// }
+	if err != nil {
+		return err
+	}
 
-	// vlanToData(vlan, d)
-	// return nil
+	ethernetToData(port, d)
+	return nil
 }
 
 func resourceInterfaceEthernetDelete(d *schema.ResourceData, m interface{}) error {
-	return errors.New("Not yet implemented")
-	// c := m.(client.Mikrotik)
-
-	// err := c.DeleteVlan(d.Id())
-
-	// if err != nil {
-	// 	return err
-	// }
-
-	// d.SetId("")
-	// return nil
+	log.Printf("[WARN] Not deleting ethernet interface `%s` because you can't", d.Get("name"))
+	return nil
 }
 
-// func vlanToData(vlan *client.Vlan, d *schema.ResourceData) error {
-// 	d.SetId(vlan.Id)
-// 	d.Set("name", vlan.Name)
-// 	d.Set("vlan_id", vlan.VlanId)
-// 	return nil
-// }
+func ethernetToData(port *client.Ethernet, d *schema.ResourceData) error {
+	d.SetId(port.Id)
+	d.Set("name", port.Name)
+	d.Set("mtu", port.Mtu)
+	return nil
+}
 
-// func prepareVlan(d *schema.ResourceData) *client.Vlan {
-// 	vlan := new(client.Vlan)
+func prepareEthernet(d *schema.ResourceData) *client.Ethernet {
+	port := new(client.Ethernet)
 
-// 	vlan.Name = d.Get("name").(string)
-// 	vlan.VlanId = d.Get("vlan_id").(int)
+	port.Name = d.Get("name").(string)
+	port.Mtu = d.Get("mtu").(int)
 
-// 	return vlan
-// }
+	return port
+}
