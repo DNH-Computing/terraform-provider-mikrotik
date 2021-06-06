@@ -62,13 +62,7 @@ func resourceInterfaceBridgePortRead(d *schema.ResourceData, m interface{}) erro
 	port, err := c.FindBridgePort(d.Id())
 
 	if err != nil {
-		d.SetId("")
-		return nil
-	}
-
-	if port == nil {
-		d.SetId("")
-		return nil
+		return err
 	}
 
 	return bridgePortToData(port, d)

@@ -38,8 +38,7 @@ func resourceInterfaceVlanCreate(d *schema.ResourceData, m interface{}) error {
 		return err
 	}
 
-	vlanToData(vlan, d)
-	return nil
+	return vlanToData(vlan, d)
 }
 
 func resourceInterfaceVlanRead(d *schema.ResourceData, m interface{}) error {
@@ -48,17 +47,10 @@ func resourceInterfaceVlanRead(d *schema.ResourceData, m interface{}) error {
 	vlan, err := c.FindVlan(d.Id())
 
 	if err != nil {
-		d.SetId("")
-		return nil
+		return err
 	}
 
-	if vlan == nil {
-		d.SetId("")
-		return nil
-	}
-
-	vlanToData(vlan, d)
-	return nil
+	return vlanToData(vlan, d)
 }
 func resourceInterfaceVlanUpdate(d *schema.ResourceData, m interface{}) error {
 	c := m.(client.Mikrotik)

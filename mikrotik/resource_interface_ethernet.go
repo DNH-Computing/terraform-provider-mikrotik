@@ -38,7 +38,6 @@ func resourceInterfaceEthernet() *schema.Resource {
 
 func resourceInterfaceEthernetCreate(d *schema.ResourceData, m interface{}) error {
 	port := prepareEthernet(d)
-	// vlan := prepareVlan(d)
 
 	c := m.(client.Mikrotik)
 
@@ -59,13 +58,7 @@ func resourceInterfaceEthernetRead(d *schema.ResourceData, m interface{}) error 
 	port, err := c.FindEthernet(d.Id())
 
 	if err != nil {
-		d.SetId("")
-		return nil
-	}
-
-	if port == nil {
-		d.SetId("")
-		return nil
+		return err
 	}
 
 	return ethernetToData(port, d)
