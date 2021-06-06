@@ -6,10 +6,11 @@ import (
 )
 
 type Ethernet struct {
-	Id    string `mikrotik:".id"`
-	Name  string `mikrotik:"name"`
-	Mtu   int    `mikrotik:"mtu"`
-	L2Mtu int    `mikrotik:"l2mtu"`
+	Id        string `mikrotik:".id"`
+	Name      string `mikrotik:"name"`
+	Mtu       int    `mikrotik:"mtu"`
+	L2Mtu     int    `mikrotik:"l2mtu"`
+	Advertise string `mikrotik:"advertise"`
 }
 
 func (context Mikrotik) FindEthernet(id string) (*Ethernet, error) {
