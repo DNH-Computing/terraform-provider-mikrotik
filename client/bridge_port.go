@@ -9,7 +9,7 @@ type BridgePort struct {
 	Id          string `mikrotik:".id"`
 	Bridge      string `mikrotik:"bridge"`
 	Interface   string `mikrotik:"interface"`
-	Pvid        int    `mikrotik:"interface"`
+	Pvid        int    `mikrotik:"pvid"`
 	Edge        string `mikrotik:"edge"`
 	TagStacking bool   `mikrotik:"tag-stacking"`
 }
@@ -54,7 +54,7 @@ func (context Mikrotik) FindBridgePort(id string) (*BridgePort, error) {
 	}
 
 	port := BridgePort{}
-	err = Unmarshal(*response, port)
+	err = Unmarshal(*response, &port)
 
 	if err != nil {
 		return nil, err

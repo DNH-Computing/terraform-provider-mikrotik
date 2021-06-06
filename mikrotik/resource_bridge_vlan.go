@@ -31,6 +31,7 @@ func resourceInterfaceBridgeVlan() *schema.Resource {
 			"tagged": &schema.Schema{
 				Type:     schema.TypeSet,
 				Optional: true,
+				Computed: true,
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
 				},
@@ -38,6 +39,7 @@ func resourceInterfaceBridgeVlan() *schema.Resource {
 			"untagged": &schema.Schema{
 				Type:     schema.TypeSet,
 				Optional: true,
+				Computed: true,
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
 				},

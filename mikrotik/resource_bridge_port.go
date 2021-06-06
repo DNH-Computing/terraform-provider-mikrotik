@@ -27,14 +27,17 @@ func resourceInterfaceBridgePort() *schema.Resource {
 			"pvid": &schema.Schema{
 				Type:     schema.TypeInt,
 				Optional: true,
+				Computed: true,
 			},
 			"edge": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
+				Computed: true,
 			},
 			"tag_stacking": &schema.Schema{
 				Type:     schema.TypeBool,
 				Optional: true,
+				Computed: true,
 			},
 		},
 	}
