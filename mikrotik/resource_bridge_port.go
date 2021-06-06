@@ -50,8 +50,7 @@ func resourceInterfaceBridgePortCreate(d *schema.ResourceData, m interface{}) er
 		return err
 	}
 
-	bridgePortToData(port, d)
-	return nil
+	return bridgePortToData(port, d)
 }
 
 func resourceInterfaceBridgePortRead(d *schema.ResourceData, m interface{}) error {
@@ -69,8 +68,7 @@ func resourceInterfaceBridgePortRead(d *schema.ResourceData, m interface{}) erro
 		return nil
 	}
 
-	bridgePortToData(port, d)
-	return nil
+	return bridgePortToData(port, d)
 }
 
 func resourceInterfaceBridgePortUpdate(d *schema.ResourceData, m interface{}) error {
@@ -85,8 +83,7 @@ func resourceInterfaceBridgePortUpdate(d *schema.ResourceData, m interface{}) er
 		return err
 	}
 
-	bridgePortToData(port, d)
-	return nil
+	return bridgePortToData(port, d)
 }
 
 func resourceInterfaceBridgePortDelete(d *schema.ResourceData, m interface{}) error {
