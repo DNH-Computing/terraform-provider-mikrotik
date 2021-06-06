@@ -43,7 +43,7 @@ func (context Mikrotik) FindBridgePort(id string) (*BridgePort, error) {
 		return nil, err
 	}
 
-	cmd := []string{"/interface/bridge/port", "?.id=" + id}
+	cmd := []string{"/interface/bridge/port/print", "?.id=" + id}
 	log.Printf("[INFO] Running the mikrotik command: `%s`", cmd)
 	response, err := client.RunArgs(cmd)
 

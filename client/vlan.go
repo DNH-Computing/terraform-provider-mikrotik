@@ -18,7 +18,7 @@ func (client Mikrotik) AddVlan(vlan *Vlan) (*Vlan, error) {
 		return nil, err
 	}
 
-	cmd := Marshal("/interface/vlan", vlan)
+	cmd := Marshal("/interface/vlan/add", vlan)
 	log.Printf("[INFO] Running the mikrotik command: `%s`", cmd)
 	response, err := c.RunArgs(cmd)
 
@@ -39,7 +39,7 @@ func (client Mikrotik) FindVlan(id string) (*Vlan, error) {
 		return nil, err
 	}
 
-	cmd := []string{"/interface/vlan", "?.id=" + id}
+	cmd := []string{"/interface/vlan/print", "?.id=" + id}
 	log.Printf("[INFO] Running the mikrotik command: `%s`", cmd)
 	response, err := c.RunArgs(cmd)
 
@@ -49,17 +49,17 @@ func (client Mikrotik) FindVlan(id string) (*Vlan, error) {
 		return nil, err
 	}
 
-	port := Vlan{}
-	err = Unmarshal(*response, port)
+	vlan := Vlan{}
+	err = Unmarshal(*response, &vlan)
 
 	if err != nil {
 		return nil, err
 	}
-	if port.Id == "" {
+	if vlan.Id == "" {
 		return nil, NewNotFound(fmt.Sprintf("Vlan `%s` not found", id))
 	}
 
-	return &port, nil
+	return &vlan, nil
 }
 
 func (client Mikrotik) UpdateVlan(vlan *Vlan) (*Vlan, error) {

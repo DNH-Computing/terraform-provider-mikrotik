@@ -19,7 +19,7 @@ func (context Mikrotik) FindEthernet(id string) (*Ethernet, error) {
 		return nil, err
 	}
 
-	cmd := []string{"/interface/ethernet", "?.id=" + id}
+	cmd := []string{"/interface/ethernet/print", "?.id=" + id}
 	log.Printf("[INFO] Running the mikrotik command: `%s`", cmd)
 	response, err := client.RunArgs(cmd)
 
@@ -29,17 +29,17 @@ func (context Mikrotik) FindEthernet(id string) (*Ethernet, error) {
 		return nil, err
 	}
 
-	port := Ethernet{}
-	err = Unmarshal(*response, port)
+	ethernet := Ethernet{}
+	err = Unmarshal(*response, &ethernet)
 
 	if err != nil {
 		return nil, err
 	}
-	if port.Id == "" {
+	if ethernet.Id == "" {
 		return nil, NewNotFound(fmt.Sprintf("Ethernet `%s` not found", id))
 	}
 
-	return &port, nil
+	return &ethernet, nil
 }
 
 func (context Mikrotik) FindEthernetByName(name string) (*Ethernet, error) {
@@ -49,7 +49,7 @@ func (context Mikrotik) FindEthernetByName(name string) (*Ethernet, error) {
 		return nil, err
 	}
 
-	cmd := []string{"/interface/ethernet", "?name=" + name}
+	cmd := []string{"/interface/ethernet/print", "?name=" + name}
 	log.Printf("[INFO] Running the mikrotik command: `%s`", cmd)
 	response, err := client.RunArgs(cmd)
 
@@ -59,27 +59,27 @@ func (context Mikrotik) FindEthernetByName(name string) (*Ethernet, error) {
 		return nil, err
 	}
 
-	port := Ethernet{}
-	err = Unmarshal(*response, port)
+	ethernet := Ethernet{}
+	err = Unmarshal(*response, &ethernet)
 
 	if err != nil {
 		return nil, err
 	}
-	if port.Id == "" {
+	if ethernet.Id == "" {
 		return nil, NewNotFound(fmt.Sprintf("Ethernet `%s` not found", name))
 	}
 
-	return &port, nil
+	return &ethernet, nil
 }
 
-func (context Mikrotik) UpdateEthernet(port *Ethernet) (*Ethernet, error) {
+func (context Mikrotik) UpdateEthernet(ethernet *Ethernet) (*Ethernet, error) {
 	client, err := context.getMikrotikClient()
 
 	if err != nil {
 		return nil, err
 	}
 
-	cmd := Marshal("/interface/ethernet/set", port)
+	cmd := Marshal("/interface/ethernet/set", ethernet)
 	log.Printf("[INFO] Running the mikrotik command: `%s`", cmd)
 	_, err = client.RunArgs(cmd)
 
@@ -87,5 +87,5 @@ func (context Mikrotik) UpdateEthernet(port *Ethernet) (*Ethernet, error) {
 		return nil, err
 	}
 
-	return context.FindEthernet(port.Id)
+	return context.FindEthernet(ethernet.Id)
 }
