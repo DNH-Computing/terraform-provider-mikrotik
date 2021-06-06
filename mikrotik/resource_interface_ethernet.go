@@ -25,6 +25,12 @@ func resourceInterfaceEthernet() *schema.Resource {
 			"mtu": &schema.Schema{
 				Type:     schema.TypeInt,
 				Optional: true,
+				Computed: true,
+			},
+			"l2mtu": &schema.Schema{
+				Type:     schema.TypeInt,
+				Optional: true,
+				Computed: true,
 			},
 		},
 	}
@@ -77,8 +83,7 @@ func resourceInterfaceEthernetUpdate(d *schema.ResourceData, m interface{}) erro
 		return err
 	}
 
-	ethernetToData(port, d)
-	return nil
+	return ethernetToData(port, d)
 }
 
 func resourceInterfaceEthernetDelete(d *schema.ResourceData, m interface{}) error {
@@ -90,6 +95,7 @@ func ethernetToData(port *client.Ethernet, d *schema.ResourceData) error {
 	d.SetId(port.Id)
 	d.Set("name", port.Name)
 	d.Set("mtu", port.Mtu)
+	d.Set("l2mtu", port.L2Mtu)
 	return nil
 }
 
@@ -98,6 +104,7 @@ func prepareEthernet(d *schema.ResourceData) *client.Ethernet {
 
 	port.Name = d.Get("name").(string)
 	port.Mtu = d.Get("mtu").(int)
+	port.L2Mtu = d.Get("l2mtu").(int)
 
 	return port
 }
