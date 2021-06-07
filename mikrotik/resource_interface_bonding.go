@@ -1,8 +1,6 @@
 package mikrotik
 
 import (
-	"strings"
-
 	"github.com/ddelnano/terraform-provider-mikrotik/client"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 )
@@ -101,7 +99,7 @@ func bondingToData(bonding *client.Bonding, d *schema.ResourceData) error {
 	if err := d.Set("name", bonding.Name); err != nil {
 		return err
 	}
-	if err := d.Set("slaves", strings.Split(bonding.Slaves, ",")); err != nil {
+	if err := d.Set("slaves", commaSeparatedStringToSlice(bonding.Slaves)); err != nil {
 		return err
 	}
 	return nil
@@ -114,11 +112,7 @@ func prepareBonding(d *schema.ResourceData) *client.Bonding {
 	bonding.Mtu = d.Get("mtu").(int)
 	bonding.Name = d.Get("name").(string)
 
-	var slaveStrings []string
-	for _, slave := range d.Get("slaves").(*schema.Set).List() {
-		slaveStrings = append(slaveStrings, slave.(string))
-	}
-	bonding.Slaves = strings.Join(slaveStrings, ",")
+	bonding.Slaves = setToCommaSeparatedString(d.Get("slaves").(*schema.Set))
 
 	return bonding
 }

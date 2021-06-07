@@ -1,6 +1,8 @@
 package mikrotik
 
 import (
+	"strings"
+
 	"github.com/ddelnano/terraform-provider-mikrotik/client"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
@@ -81,4 +83,20 @@ type mikrotikConn struct {
 	host     string
 	username string
 	password string
+}
+
+func setToCommaSeparatedString(s *schema.Set) string {
+	var stringSlice []string
+	for _, item := range s.List() {
+		stringSlice = append(stringSlice, item.(string))
+	}
+	return strings.Join(stringSlice, ",")
+}
+
+func commaSeparatedStringToSlice(s string) []string {
+	// Treat an empty string as an empty slice [], rather than a slice containing an empty string [""]
+	if s == "" {
+		return []string{}
+	}
+	return strings.Split(s, ",")
 }

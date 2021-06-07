@@ -1,8 +1,6 @@
 package mikrotik
 
 import (
-	"strings"
-
 	"github.com/ddelnano/terraform-provider-mikrotik/client"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
@@ -101,13 +99,13 @@ func bridgeVlanToData(vlan *client.BridgeVlan, d *schema.ResourceData) error {
 	if err := d.Set("bridge", vlan.Bridge); err != nil {
 		return err
 	}
-	if err := d.Set("vlan_ids", strings.Split(vlan.VlanIds, ",")); err != nil {
+	if err := d.Set("vlan_ids", commaSeparatedStringToSlice(vlan.VlanIds)); err != nil {
 		return err
 	}
-	if err := d.Set("tagged", strings.Split(vlan.Tagged, ",")); err != nil {
+	if err := d.Set("tagged", commaSeparatedStringToSlice(vlan.Tagged)); err != nil {
 		return err
 	}
-	if err := d.Set("untagged", strings.Split(vlan.Untagged, ",")); err != nil {
+	if err := d.Set("untagged", commaSeparatedStringToSlice(vlan.Untagged)); err != nil {
 		return err
 	}
 	return nil
@@ -118,23 +116,11 @@ func prepareBridgeVlan(d *schema.ResourceData) *client.BridgeVlan {
 
 	vlan.Bridge = d.Get("bridge").(string)
 
-	var vlanStrings []string
-	for _, vlan := range d.Get("vlan_ids").(*schema.Set).List() {
-		vlanStrings = append(vlanStrings, vlan.(string))
-	}
-	vlan.VlanIds = strings.Join(vlanStrings, ",")
+	vlan.VlanIds = setToCommaSeparatedString(d.Get("vlan_ids").(*schema.Set))
 
-	var taggedStrings []string
-	for _, tagged := range d.Get("tagged").(*schema.Set).List() {
-		taggedStrings = append(taggedStrings, tagged.(string))
-	}
-	vlan.Tagged = strings.Join(taggedStrings, ",")
+	vlan.Tagged = setToCommaSeparatedString(d.Get("tagged").(*schema.Set))
 
-	var untaggedStrings []string
-	for _, untagged := range d.Get("untagged").(*schema.Set).List() {
-		untaggedStrings = append(untaggedStrings, untagged.(string))
-	}
-	vlan.Untagged = strings.Join(untaggedStrings, ",")
+	vlan.Untagged = setToCommaSeparatedString(d.Get("untagged").(*schema.Set))
 
 	return vlan
 }

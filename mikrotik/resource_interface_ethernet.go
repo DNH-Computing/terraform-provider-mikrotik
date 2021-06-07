@@ -2,7 +2,6 @@ package mikrotik
 
 import (
 	"log"
-	"strings"
 
 	"github.com/ddelnano/terraform-provider-mikrotik/client"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
@@ -98,7 +97,7 @@ func ethernetToData(port *client.Ethernet, d *schema.ResourceData) error {
 	d.Set("name", port.Name)
 	d.Set("mtu", port.Mtu)
 	d.Set("l2mtu", port.L2Mtu)
-	if err := d.Set("advertise", strings.Split(port.Advertise, ",")); err != nil {
+	if err := d.Set("advertise", commaSeparatedStringToSlice(port.Advertise)); err != nil {
 		return err
 	}
 	return nil
@@ -110,11 +109,7 @@ func prepareEthernet(d *schema.ResourceData) *client.Ethernet {
 	port.Name = d.Get("name").(string)
 	port.Mtu = d.Get("mtu").(int)
 	port.L2Mtu = d.Get("l2mtu").(int)
-	var advertiseStrings []string
-	for _, advertise := range d.Get("advertise").(*schema.Set).List() {
-		advertiseStrings = append(advertiseStrings, advertise.(string))
-	}
-	port.Advertise = strings.Join(advertiseStrings, ",")
+	port.Advertise = setToCommaSeparatedString(d.Get("advertise").(*schema.Set))
 
 	return port
 }
