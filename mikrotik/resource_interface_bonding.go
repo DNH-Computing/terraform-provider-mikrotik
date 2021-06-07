@@ -31,6 +31,11 @@ func resourceInterfaceBonding() *schema.Resource {
 				Optional: true,
 				Computed: true,
 			},
+			"transmit_hash_policy": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
+				Computed: true,
+			},
 			"slaves": &schema.Schema{
 				Type:     schema.TypeSet,
 				Required: true,
@@ -99,6 +104,9 @@ func bondingToData(bonding *client.Bonding, d *schema.ResourceData) error {
 	if err := d.Set("name", bonding.Name); err != nil {
 		return err
 	}
+	if err := d.Set("transmit_hash_policy", bonding.TransmitHashPolicy); err != nil {
+		return err
+	}
 	if err := d.Set("slaves", commaSeparatedStringToSlice(bonding.Slaves)); err != nil {
 		return err
 	}
@@ -111,6 +119,7 @@ func prepareBonding(d *schema.ResourceData) *client.Bonding {
 	bonding.Mode = d.Get("mode").(string)
 	bonding.Mtu = d.Get("mtu").(int)
 	bonding.Name = d.Get("name").(string)
+	bonding.TransmitHashPolicy = d.Get("transit_hash_policy").(string)
 
 	bonding.Slaves = setToCommaSeparatedString(d.Get("slaves").(*schema.Set))
 

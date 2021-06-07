@@ -6,11 +6,12 @@ import (
 )
 
 type Bonding struct {
-	Id     string `mikrotik:".id"`
-	Mode   string `mikrotik:"mode"`
-	Mtu    int    `mikrotik:"mtu"`
-	Name   string `mikrotik:"name"`
-	Slaves string `mikrotik:"slaves"`
+	Id                 string `mikrotik:".id"`
+	Mode               string `mikrotik:"mode"`
+	Mtu                int    `mikrotik:"mtu"`
+	Name               string `mikrotik:"name"`
+	Slaves             string `mikrotik:"slaves"`
+	TransmitHashPolicy string `mikrotik:"transmit-hash-policy"`
 }
 
 func (client Mikrotik) AddBonding(p *Bonding) (*Bonding, error) {
