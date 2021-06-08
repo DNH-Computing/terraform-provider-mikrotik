@@ -40,6 +40,16 @@ func resourceInterfaceEthernet() *schema.Resource {
 					Type: schema.TypeString,
 				},
 			},
+			"auto_negotiation": &schema.Schema{
+				Type:     schema.TypeBool,
+				Optional: true,
+				Computed: true,
+			},
+			"speed": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
+				Computed: true,
+			},
 		},
 	}
 }
@@ -97,6 +107,8 @@ func ethernetToData(port *client.Ethernet, d *schema.ResourceData) error {
 	d.Set("name", port.Name)
 	d.Set("mtu", port.Mtu)
 	d.Set("l2mtu", port.L2Mtu)
+	d.Set("auto_negotiation", port.AutoNegotiation)
+	d.Set("speed", port.Speed)
 	if err := d.Set("advertise", commaSeparatedStringToSlice(port.Advertise)); err != nil {
 		return err
 	}
@@ -109,6 +121,8 @@ func prepareEthernet(d *schema.ResourceData) *client.Ethernet {
 	port.Name = d.Get("name").(string)
 	port.Mtu = d.Get("mtu").(int)
 	port.L2Mtu = d.Get("l2mtu").(int)
+	port.AutoNegotiation = d.Get("auto_negotiation").(bool)
+	port.Speed = d.Get("speed").(string)
 	port.Advertise = setToCommaSeparatedString(d.Get("advertise").(*schema.Set))
 
 	return port
