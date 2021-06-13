@@ -39,6 +39,11 @@ func resourceInterfaceBridgePort() *schema.Resource {
 				Optional: true,
 				Computed: true,
 			},
+			"hw": &schema.Schema{
+				Type:     schema.TypeBool,
+				Optional: true,
+				Computed: true,
+			},
 		},
 	}
 }
@@ -113,6 +118,9 @@ func bridgePortToData(port *client.BridgePort, d *schema.ResourceData) error {
 	if err := d.Set("tag_stacking", port.TagStacking); err != nil {
 		return err
 	}
+	if err := d.Set("hw", port.HW); err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -124,6 +132,7 @@ func prepareBridgePort(d *schema.ResourceData) *client.BridgePort {
 	port.Pvid = d.Get("pvid").(int)
 	port.Edge = d.Get("edge").(string)
 	port.TagStacking = d.Get("tag_stacking").(bool)
+	port.HW = d.Get("hw").(bool)
 
 	return port
 }

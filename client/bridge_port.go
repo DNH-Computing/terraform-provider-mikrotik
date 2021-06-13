@@ -12,6 +12,7 @@ type BridgePort struct {
 	Pvid        int    `mikrotik:"pvid"`
 	Edge        string `mikrotik:"edge"`
 	TagStacking bool   `mikrotik:"tag-stacking"`
+	HW          bool   `mikrotik:"hw"`
 }
 
 func (context Mikrotik) AddBridgePort(port *BridgePort) (*BridgePort, error) {
