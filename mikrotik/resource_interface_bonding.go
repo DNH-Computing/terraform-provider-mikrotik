@@ -119,7 +119,7 @@ func prepareBonding(d *schema.ResourceData) *client.Bonding {
 	bonding.Mode = d.Get("mode").(string)
 	bonding.Mtu = d.Get("mtu").(int)
 	bonding.Name = d.Get("name").(string)
-	bonding.TransmitHashPolicy = d.Get("transit_hash_policy").(string)
+	bonding.TransmitHashPolicy = d.Get("transmit_hash_policy").(string)
 
 	bonding.Slaves = setToCommaSeparatedString(d.Get("slaves").(*schema.Set))
 
